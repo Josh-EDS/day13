@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+</head>
+<body>
+<form class="form" onsubmit="return handleSubmit(event)">
+    <div class="title">Welcome</div>
+    <div class="subtitle">Let's create your account!</div>
+
+    <div class="input-container ic2">
+        <input id="firstname" name="firstname" class="input" type="text" placeholder=" " required />
+        <div class="cut"></div>
+        <label for="firstname" class="placeholder">First name</label>
+    </div>
+
+    <div class="input-container ic2">
+        <input id="lastname" name="lastname" class="input" type="text" placeholder=" " required />
+        <div class="cut"></div>
+        <label for="lastname" class="placeholder">Last name</label>
+    </div>
+
+    <div class="input-container ic2">
+        <input id="email" name="email" class="input" type="email" placeholder=" " required />
+        <div class="cut"></div>
+        <label for="email" class="placeholder">Email</label>
+    </div>
+
+    <div class="input-container ic2">
+        <input id="password" name="password" class="input" type="password" placeholder=" " required />
+        <div class="cut"></div>
+        <label for="password" class="placeholder">Password</label>
+    </div>
+
+    <button type="submit" class="submit">Submit</button>
+    <p id="error" class="error"></p>
+    <p>Or if you already have one</p>
+    <a href="./login"><button type="button" class="login">Login</button></a>
+    
+</form>
+
+<!-- CSS -->
+<style>
+body {
+    align-items: center;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+}
+
+.form {
+    background-color: #15172b;
+    border-radius: 20px;
+    box-sizing: border-box;
+    padding: 20px;
+    width: 320px;
+}
+
+.title {
+    color: #eee;
+    font-family: sans-serif;
+    font-size: 36px;
+    font-weight: 600;
+    margin-top: 30px;
+}
+
+.subtitle {
+    color: #eee;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.input-container {
+    height: 50px;
+    position: relative;
+    width: 100%;
+}
+
+.ic1 {
+    margin-top: 40px;
+}
+
+.ic2 {
+    margin-top: 30px;
+}
+
+.input {
+    background-color: #303245;
+    border-radius: 12px;
+    border: 0;
+    box-sizing: border-box;
+    color: #eee;
+    font-size: 18px;
+    height: 100%;
+    outline: 0;
+    padding: 4px 20px 0;
+    width: 100%;
+}
+
+.cut {
+    background-color: #15172b;
+    border-radius: 10px;
+    height: 20px;
+    left: 20px;
+    position: absolute;
+    top: -20px;
+    transform: translateY(0);
+    transition: transform 200ms;
+    width: 76px;
+}
+
+.cut-short {
+    width: 50px;
+}
+
+.input:focus ~ .cut,
+.input:not(:placeholder-shown) ~ .cut {
+    transform: translateY(8px);
+}
+
+.placeholder {
+    color: #65657b;
+    font-family: sans-serif;
+    left: 20px;
+    line-height: 14px;
+    pointer-events: none;
+    position: absolute;
+    transform-origin: 0 50%;
+    transition: transform 200ms, color 200ms;
+    top: 20px;
+}
+
+.input:focus ~ .placeholder,
+.input:not(:placeholder-shown) ~ .placeholder {
+    transform: translateY(-30px) translateX(10px) scale(0.75);
+}
+
+.input:not(:placeholder-shown) ~ .placeholder {
+    color: #808097;
+}
+
+.input:focus ~ .placeholder {
+    color: #dc2f55;
+}
+
+.submit {
+    background-color: #08d;
+    border-radius: 12px;
+    border: 0;
+    box-sizing: border-box;
+    color: #eee;
+    cursor: pointer;
+    font-size: 18px;
+    height: 50px;
+    margin-top: 38px;
+    outline: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.submit:active {
+    background-color: #06b;
+}
+
+/* Style for "Or if you already have one" */
+p {
+    color: #eee;
+    font-family: sans-serif;
+    font-size: 14px;
+    margin: 20px 0 10px;
+    text-align: center;
+}
+
+/* Style for the Login button */
+.login {
+    background-color: #15172b;
+    border: 1px solid #08d;
+    border-radius: 12px;
+    color: #eee;
+    cursor: pointer;
+    font-size: 18px;
+    height: 50px;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.login:hover {
+    background-color: #08d;
+    color: #15172b;
+}
+
+.error {
+    color: #CC666E;
+    font-family: sans-serif;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+</style>
+
+<!-- SCRIPT JS -->
+<script>
+function handleSubmit(event) {
+    event.preventDefault();  // Prevent form submission
+
+    const formData = {
+        firstname: document.getElementById('firstname').value,
+        lastname: document.getElementById('lastname').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+    };
+
+    // Regular expression for validating first and last names (letters and hyphens only)
+    const nameRegex = /^[A-Za-z-]+$/;
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Regular expression for password validation
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+    // Check if First name or Last name is empty
+    if (!formData.firstname) {
+        alert('First name must not be empty');
+        document.getElementById('error').textContent = 'First name must not be empty';
+        return;
+    }
+    if (!formData.lastname) {
+        alert('Last name must not be empty');
+        document.getElementById('error').textContent = 'Last name must not be empty';
+        return;
+    }
+
+    // Validate first and last names (letters and hyphens only)
+    if (!nameRegex.test(formData.firstname)) {
+        alert('First name can only contain letters or hyphens');
+        document.getElementById('error').textContent = 'First name can only contain letters or hyphens';
+        return;
+    }
+    if (!nameRegex.test(formData.lastname)) {
+        alert('Last name can only contain letters or hyphens');
+        document.getElementById('error').textContent = 'Last name can only contain letters or hyphens';
+        return;
+    }
+
+    // Check if email is valid
+    if (!emailRegex.test(formData.email)) {
+        alert('Email is badly formatted');
+        document.getElementById('error').textContent = 'Email is badly formatted';
+        return;
+    }
+
+    // Validate password: at least 8 characters, contains at least one letter and one number
+    if (!passwordRegex.test(formData.password)) {
+        alert('Password must be at least 8 characters long and contain at least a letter and a number');
+        document.getElementById('error').textContent = 'Password must be at least 8 characters long and contain at least a letter and a number';
+        return;
+    }
+
+    // If all validations pass, send form data
+    fetch('http://localhost:3000/validateForm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ form: formData }),
+    })
+    .then(response => response.json())
+    .then(data => { document.getElementById('error').textContent = data.error; })
+    .catch(error => {
+        alert('Error:', error);
+    });
+}
+
+</script>
+</body>
+</html>
